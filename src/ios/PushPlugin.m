@@ -43,6 +43,23 @@
     [self successWithMessage:@"unregistered"];
 }
 
+- (void)isEnabled:(CDVInvokedUrlCommand*)command;
+ {
+		self.callbackId = command.callbackId;
+
+		if ([[UIApplication sharedApplication] respondsToSelector:@selector(currentUserNotificationSettings)]){ // Check it's iOS 8 and above
+		UIUserNotificationSettings *grantedSettings = [[UIApplication sharedApplication] currentUserNotificationSettings];
+
+		if (grantedSettings.types == UIUserNotificationTypeNone) {
+				NSLog(@"No permission granted");
+			} else if (grantedSettings.types & UIUserNotificationTypeSound & UIUserNotificationTypeAlert ){
+				NSLog(@"Sound and alert permissions ");
+			} else if (grantedSettings.types  & UIUserNotificationTypeAlert){
+				NSLog(@"Alert Permission Granted");
+		}
+	}
+}
+
 - (void)register:(CDVInvokedUrlCommand*)command;
 {
 	self.callbackId = command.callbackId;
@@ -133,14 +150,6 @@
 	if (notificationMessage)			// if there is a pending startup notification
 		[self notificationReceived];	// go ahead and process it
 }
-
-/*
-- (void)isEnabled:(NSMutableArray *)arguments withDict:(NSMutableDictionary *)options {
-    UIRemoteNotificationType type = [[UIApplication sharedApplication] enabledRemoteNotificationTypes];
-    NSString *jsStatement = [NSString stringWithFormat:@"navigator.PushPlugin.isEnabled = %d;", type != UIRemoteNotificationTypeNone];
-    NSLog(@"JSStatement %@",jsStatement);
-}
-*/
 
 - (void)didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
 
